@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Meus Passeios</string>
+
+    <string name="hint_nome">Nome do passeio</string>
+    <string name="hint_descricao">Descrição</string>
+    <string name="hint_inicio">Hora início</string>
+    <string name="hint_fim">Hora fim</string>
+    <string name="btn_iniciar">Iniciar passeio</string>
+    <string name="btn_lista">Ver passeios salvos</string>
+
+    <string-array name="tipos_passeio">
+        <item>A pé</item>
+        <item>Carro</item>
+        <item>Ônibus</item>
+        <item>Aéreo</item>
+        <item>Náutico</item>
+        <item>Bicicleta</item>
+        <item>Moto</item>
+    </string-array>
+</resources>
