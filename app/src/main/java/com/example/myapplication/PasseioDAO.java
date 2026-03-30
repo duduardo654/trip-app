@@ -20,6 +20,30 @@ public class PasseioDAO {
         return db.rawQuery("SELECT id AS _id, nome FROM passeio", null);
     }
 
+    public ArrayList<Passeio> listarPasseios() {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        ArrayList<Passeio> lista = new ArrayList<>();
+
+        Cursor c = db.rawQuery(
+                "SELECT id, nome, tipo, descricao, inicio, fim FROM passeio ORDER BY id DESC",
+                null
+        );
+
+        while (c.moveToNext()) {
+            Passeio p = new Passeio();
+            p.id        = c.getLong(c.getColumnIndexOrThrow("id"));
+            p.nome      = c.getString(c.getColumnIndexOrThrow("nome"));
+            p.tipo      = c.getString(c.getColumnIndexOrThrow("tipo"));
+            p.descricao = c.getString(c.getColumnIndexOrThrow("descricao"));
+            p.inicio    = c.getString(c.getColumnIndexOrThrow("inicio"));
+            p.fim       = c.getString(c.getColumnIndexOrThrow("fim"));
+            lista.add(p);
+        }
+
+        c.close();
+        return lista;
+    }
+
     public long inserirPasseio(Passeio p) {
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues v = new ContentValues();

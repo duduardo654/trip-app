@@ -1,16 +1,21 @@
 package com.example.myapplication;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
+import android.view.MotionEvent;
+import android.widget.CheckBox;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
 
 public class ListaActivity extends AppCompatActivity {
 
     PasseioDAO dao;
+    ArrayList<Passeio> lista;
+    PasseioAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,24 +23,53 @@ public class ListaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_lista);
 
         dao = new PasseioDAO(this);
-        ListView lista = findViewById(R.id.lista);
+        ListView listView = findViewById(R.id.lista);
 
-        Cursor cursor = dao.listar();
+        lista   = dao.listarPasseios();
+        adapter = new PasseioAdapter(this, lista);
+        listView.setAdapter(adapter);
 
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(
-                this,
-                android.R.layout.simple_list_item_1,
-                cursor,
-                new String[]{"nome"},
-                new int[]{android.R.id.text1},
-                0
-        );
+        listView.setOnTouchListener((v, event) -> {
+            if (event.getAction() != MotionEvent.ACTION_UP) return false;
 
-        lista.setAdapter(adapter);
+            int x = (int) event.getX();
+            int y = (int) event.getY();
 
-        lista.setOnItemClickListener((parent, view, position, id) -> {
+            int position = listView.pointToPosition(x, y);
+            if (position == ListView.INVALID_POSITION) return false;
+
+            View itemView = listView.getChildAt(
+                    position - listView.getFirstVisiblePosition()
+            );
+            if (itemView == null) return false;
+
+            CheckBox chk = itemView.findViewById(R.id.chkPasseio);
+            if (chk == null) return false;
+
+            int[] chkLoc   = new int[2];
+            int[] listLoc  = new int[2];
+            chk.getLocationOnScreen(chkLoc);
+            listView.getLocationOnScreen(listLoc);
+
+            int chkLeft   = chkLoc[0] - listLoc[0];
+            int chkTop    = chkLoc[1] - listLoc[1];
+            int chkRight  = chkLeft + chk.getWidth();
+            int chkBottom = chkTop  + chk.getHeight();
+
+            if (x >= chkLeft && x <= chkRight && y >= chkTop && y <= chkBottom) {
+                Passeio p = lista.get(position);
+                p.selecionado = !p.selecionado;
+                adapter.notifyDataSetChanged();
+                return true;
+            }
+
+            return false;
+        });
+
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            Passeio p = lista.get(position);
             Intent i = new Intent(this, DetalhesActivity.class);
-            i.putExtra("id_passeio", id);
+            i.putExtra("id_passeio", p.id);
             startActivity(i);
         });
     }
